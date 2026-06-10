@@ -1,0 +1,374 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>أكاديمية مستر مصطفى - نسخة الأسماء</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: { extend: { fontFamily: { cairo: ['Cairo', 'sans-serif'] } } }
+        }
+    </script>
+    <style>
+        body { font-family: 'Cairo', sans-serif; touch-action: manipulation; }
+        .app-container { width: 100%; max-width: 500px; height: 100vh; display: flex; flex-direction: column; background: #fdfcfe; }
+        .dark .app-container { background: #0f172a; }
+        
+        .level-btn {
+            flex: 1;
+            padding: 12px;
+            border-radius: 16px;
+            font-weight: 900;
+            transition: all 0.3s;
+            border: 3px solid transparent;
+        }
+        .level-1 { background: #dcfce7; color: #166534; }
+        .level-2 { background: #fef9c3; color: #854d0e; }
+        .level-3 { background: #fee2e2; color: #991b1b; }
+        .active-level { border-color: currentColor; transform: scale(1.05); box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+
+        .math-card {
+            background: white;
+            border: 3px solid #e2e8f0;
+            border-radius: 24px;
+            transition: all 0.2s;
+            box-shadow: 0 6px 0 #e2e8f0;
+        }
+        .math-card:active { transform: translateY(4px); box-shadow: 0 2px 0 #e2e8f0; }
+        .dark .math-card { background: #1e293b; border-color: #334155; box-shadow: 0 6px 0 #0f172a; }
+
+        .spark-bubble {
+            position: relative;
+            background: #4f46e5;
+            color: white;
+            border-radius: 20px;
+            padding: 10px 15px;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+        .spark-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            right: 20px;
+            border-width: 10px 10px 0;
+            border-style: solid;
+            border-color: #4f46e5 transparent;
+        }
+
+        /* شاشة البداية */
+        #name-overlay {
+            position: absolute;
+            inset: 0;
+            background: white;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            text-align: center;
+        }
+        .dark #name-overlay { background: #0f172a; }
+    </style>
+</head>
+<body class="bg-slate-100 dark:bg-slate-950 flex justify-center overflow-hidden">
+
+<div class="app-container shadow-2xl relative">
+    
+    <!-- Name Entry Overlay -->
+    <div id="name-overlay" class="animate__animated animate__fadeIn">
+        <div class="mb-6">
+            <img src="https://api.dicebear.com/7.x/bottts/svg?seed=Sparky" class="w-24 h-24 mx-auto mb-4 animate-bounce" alt="Sparky">
+            <h2 class="text-2xl font-black text-indigo-600 mb-2">مرحباً بك في أكاديمية مستر مصطفى دحروج</h2>
+            <p class="text-slate-500 font-bold">ما هو اسم التلميذ أو التلميذة؟</p>
+        </div>
+        <input type="text" id="student-name" placeholder="اكتب الاسم هنا..." 
+               class="w-full p-4 text-center text-xl font-bold border-4 border-indigo-200 rounded-3xl mb-4 focus:border-indigo-500 outline-none transition-all dark:bg-slate-800 dark:text-white">
+        <button onclick="startGame()" class="w-full bg-indigo-600 text-white font-black py-4 rounded-3xl shadow-xl hover:bg-indigo-700 transition-all text-xl">
+            ابدأ التعلم الآن 🚀
+        </button>
+    </div>
+
+    <!-- Top Header -->
+    <div class="p-4 bg-white dark:bg-slate-900 border-b dark:border-slate-800">
+        <div class="flex justify-between items-center mb-4">
+            <button onclick="toggleDarkMode()" class="text-2xl">🌙</button>
+            <div class="text-center">
+                <h1 class="text-lg font-black text-indigo-600 dark:text-indigo-400">أكاديمية مستر مصطفى دحروج 🎓</h1>
+                <p id="display-name" class="text-xs font-bold text-slate-400"></p>
+            </div>
+            <div class="flex items-center gap-1 bg-amber-100 px-3 py-1 rounded-full">
+                <span class="text-lg">⭐</span>
+                <span id="score-val" class="font-black text-amber-700">0</span>
+            </div>
+        </div>
+
+        <!-- Level Selector -->
+        <div class="flex gap-2">
+            <button onclick="changeLevel(1)" id="btn-l1" class="level-btn level-1 active-level">بسيط 🌱</button>
+            <button onclick="changeLevel(2)" id="btn-l2" class="level-btn level-2">متوسط 🍄</button>
+            <button onclick="changeLevel(3)" id="btn-l3" class="level-btn level-3">عبقري 🔥</button>
+        </div>
+    </div>
+
+    <!-- Main Game Area -->
+    <div id="game-area" class="flex-1 p-6 flex flex-col items-center justify-center space-y-6 overflow-y-auto">
+        <!-- Questions injected here -->
+    </div>
+
+    <!-- Coach Sparky Area -->
+    <div id="sparky-container" class="px-6 pb-4 flex items-end justify-start gap-3">
+        <div class="flex-1 mb-4 animate__animated animate__fadeInUp" id="sparky-msg-box" style="display:none">
+            <div class="spark-bubble" id="sparky-text">أحسنت!</div>
+        </div>
+        <img src="https://api.dicebear.com/7.x/bottts/svg?seed=Sparky" class="w-16 h-16 bg-indigo-100 rounded-full border-4 border-white shadow-lg animate-bounce" alt="Sparky">
+    </div>
+
+    <!-- Bottom Nav -->
+    <div class="grid grid-cols-3 p-4 bg-white dark:bg-slate-900 border-t dark:border-slate-800">
+        <button onclick="setMode('pv')" id="nav-pv" class="flex flex-col items-center text-indigo-600">
+            <span class="text-2xl">💎</span>
+            <span class="text-xs font-bold">القيم</span>
+        </button>
+        <button onclick="setMode('comp')" id="nav-comp" class="flex flex-col items-center text-slate-400">
+            <span class="text-2xl">⚖️</span>
+            <span class="text-xs font-bold">المقارنة</span>
+        </button>
+        <button onclick="setMode('ord')" id="nav-ord" class="flex flex-col items-center text-slate-400">
+            <span class="text-2xl">📈</span>
+            <span class="text-xs font-bold">الترتيب</span>
+        </button>
+    </div>
+</div>
+
+<script>
+    let state = {
+        level: 1,
+        mode: 'pv',
+        score: 0,
+        correctCount: 0,
+        studentName: ''
+    };
+
+    // نظام الأصوات
+    const sounds = {
+        correct: new Audio('https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3'),
+        wrong: new Audio('https://assets.mixkit.co/active_storage/sfx/2018/2018-preview.mp3'),
+        levelUp: new Audio('https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3')
+    };
+
+    function startGame() {
+        const nameInput = document.getElementById('student-name').value.trim();
+        if (nameInput === "") {
+            alert("من فضلك اكتب اسمك أولاً يا بطل!");
+            return;
+        }
+        state.studentName = nameInput;
+        document.getElementById('display-name').innerText = "التلميذ: " + state.studentName;
+        document.getElementById('name-overlay').classList.add('animate__fadeOut');
+        setTimeout(() => {
+            document.getElementById('name-overlay').style.display = 'none';
+            speakSparky("أهلاً بك يا " + state.studentName + " في أكاديمية مستر مصطفى دحروج");
+            render();
+        }, 500);
+    }
+
+    function playSound(type) {
+        sounds[type].currentTime = 0;
+        sounds[type].play().catch(e => console.log("Audio play blocked"));
+    }
+
+    function speakSparky(text) {
+        if ('speechSynthesis' in window) {
+            const msg = new SpeechSynthesisUtterance();
+            msg.text = text;
+            msg.lang = 'ar-SA';
+            msg.rate = 1.0;
+            window.speechSynthesis.speak(msg);
+        }
+    }
+
+    function toggleDarkMode() { document.documentElement.classList.toggle('dark'); }
+
+    function changeLevel(l) {
+        state.level = l;
+        document.querySelectorAll('.level-btn').forEach((b, i) => {
+            b.classList.toggle('active-level', i+1 === l);
+        });
+        const msg = `يا ${state.studentName}، تم تفعيل المستوى ${l === 1 ? 'البسيط' : l === 2 ? 'المتوسط' : 'العبقري'}!`;
+        showSparky(msg);
+        playSound('levelUp');
+        speakSparky(msg);
+        render();
+    }
+
+    function setMode(m) {
+        state.mode = m;
+        ['pv', 'comp', 'ord'].forEach(mode => {
+            const el = document.getElementById('nav-' + mode);
+            el.classList.toggle('text-indigo-600', mode === m);
+            el.classList.toggle('text-slate-400', mode !== m);
+        });
+        render();
+    }
+
+    function showSparky(msg) {
+        const box = document.getElementById('sparky-msg-box');
+        const text = document.getElementById('sparky-text');
+        text.innerText = msg;
+        box.style.display = 'block';
+        setTimeout(() => { box.style.display = 'none'; }, 4000);
+    }
+
+    function handleAnswer(isCorrect) {
+        if(isCorrect) {
+            state.score += (10 * state.level);
+            state.correctCount++;
+            document.getElementById('score-val').innerText = state.score;
+            playSound('correct');
+            confetti({ particleCount: 100, spread: 70, origin: { y: 0.8 } });
+            
+            const rewards = [
+                `أحسنت يا ${state.studentName}! مستر مصطفى فخور بك جداً`,
+                `إجابة عبقرية يا ${state.studentName}! استمر في التألق`,
+                `ممتاز! أنتِ أذكى تلميذة في الأكاديمية يا ${state.studentName}`,
+                `رائع جداً يا ${state.studentName}! مهاراتك الحسابية مذهلة`
+            ];
+
+            const msg = rewards[Math.floor(Math.random() * rewards.length)];
+            showSparky(msg);
+            speakSparky(msg);
+        } else {
+            playSound('wrong');
+            const tryAgainMsgs = [
+                `حاول مرة أخرى يا ${state.studentName}، أنت ذكي وستنجح`,
+                `لا بأس يا ${state.studentName}، مستر مصطفى يعلم أنك ستصيب المرة القادمة`
+            ];
+            const msg = tryAgainMsgs[Math.floor(Math.random() * tryAgainMsgs.length)];
+            showSparky(msg);
+            speakSparky(msg);
+        }
+        
+        const area = document.getElementById('game-area');
+        area.classList.add('animate__animated', isCorrect ? 'animate__bounceIn' : 'animate__shakeX');
+        setTimeout(() => {
+            area.classList.remove('animate__animated', 'animate__bounceIn', 'animate__shakeX');
+            render();
+        }, 1200);
+    }
+
+    function render() {
+        if (!state.studentName) return;
+        const area = document.getElementById('game-area');
+        area.innerHTML = '';
+
+        if(state.mode === 'pv') renderPV(area);
+        else if(state.mode === 'comp') renderComp(area);
+        else renderOrd(area);
+    }
+
+    function renderPV(area) {
+        let num;
+        if(state.level === 1) num = Math.floor(Math.random() * 90) + 10;
+        else if(state.level === 2) num = Math.floor(Math.random() * 900) + 100;
+        else num = Math.floor(Math.random() * 9000) + 1000;
+
+        const digits = num.toString().split('').reverse();
+        const idx = Math.floor(Math.random() * digits.length);
+        const places = ["الآحاد", "العشرات", "المئات", "الألوف"];
+        const correct = parseInt(digits[idx]) * Math.pow(10, idx);
+
+        area.innerHTML = `
+            <div class="w-full text-center space-y-6">
+                <div class="text-7xl font-black text-indigo-600 tracking-tighter animate__animated animate__pulse animate__infinite">${num}</div>
+                <div class="p-4 bg-indigo-50 dark:bg-indigo-900/30 rounded-2xl border-2 border-indigo-200">
+                    <p class="text-xl font-bold">ما قيمة الرقم <span class="text-3xl text-red-500">${digits[idx]}</span> في خانة <span class="text-indigo-600 underline">${places[idx]}</span>؟</p>
+                </div>
+                <div class="grid grid-cols-2 gap-4" id="opts"></div>
+            </div>
+        `;
+
+        let opts = new Set([correct]);
+        while(opts.size < 4) opts.add(Math.floor(Math.random() * 9 + 1) * Math.pow(10, Math.floor(Math.random() * digits.length)));
+        
+        Array.from(opts).sort(() => Math.random() - 0.5).forEach(o => {
+            const btn = document.createElement('button');
+            btn.className = "math-card p-5 text-2xl font-black";
+            btn.innerText = o;
+            btn.onclick = () => handleAnswer(o === correct);
+            document.getElementById('opts').appendChild(btn);
+        });
+    }
+
+    function renderComp(area) {
+        let range = state.level === 1 ? 20 : (state.level === 2 ? 200 : 2000);
+        const n1 = Math.floor(Math.random() * range);
+        const n2 = Math.floor(Math.random() * range);
+        const ans = n1 > n2 ? '>' : (n1 < n2 ? '<' : '=');
+
+        area.innerHTML = `
+            <div class="w-full text-center space-y-10">
+                <div class="flex justify-between items-center gap-4">
+                    <div class="math-card flex-1 py-10 text-4xl font-black">${n1}</div>
+                    <div class="text-5xl text-amber-500 font-black animate__animated animate__swing animate__infinite">؟</div>
+                    <div class="math-card flex-1 py-10 text-4xl font-black">${n2}</div>
+                </div>
+                <div class="grid grid-cols-3 gap-4">
+                    ${['>', '=', '<'].map(op => `<button onclick="handleAnswer('${op}' === '${ans}')" class="math-card py-6 text-4xl font-black text-indigo-600">${op}</button>`).join('')}
+                </div>
+            </div>
+        `;
+    }
+
+    function renderOrd(area) {
+        const count = state.level === 1 ? 3 : (state.level === 2 ? 4 : 5);
+        let nums = [];
+        while(nums.length < count) {
+            let n = Math.floor(Math.random() * (state.level * 100));
+            if(!nums.includes(n)) nums.push(n);
+        }
+        let target = [...nums].sort((a,b) => a-b);
+        let userArr = [];
+
+        area.innerHTML = `
+            <div class="w-full text-center space-y-6">
+                <h3 class="text-xl font-black">رتب من <span class="text-green-600">الأصغر</span> إلى <span class="text-red-600">الأكبر</span></h3>
+                <div class="flex flex-wrap justify-center gap-3" id="pool"></div>
+                <div class="min-h-[80px] w-full bg-slate-100 dark:bg-slate-800 rounded-3xl border-4 border-dashed border-slate-300 flex items-center justify-center gap-2 p-3" id="dropzone">
+                    <p class="text-slate-400 text-sm font-bold">يا بطل، المس الأرقام بالترتيب...</p>
+                </div>
+            </div>
+        `;
+
+        nums.forEach(n => {
+            const btn = document.createElement('button');
+            btn.className = "math-card px-5 py-3 text-xl font-black bg-white";
+            btn.innerText = n;
+            btn.onclick = () => {
+                if(btn.style.opacity === '0.3') return;
+                btn.style.opacity = '0.3';
+                userArr.push(n);
+                if(userArr.length === 1) document.getElementById('dropzone').innerHTML = '';
+                
+                const chip = document.createElement('div');
+                chip.className = "bg-indigo-600 text-white px-4 py-2 rounded-xl font-black animate__animated animate__backInDown";
+                chip.innerText = n;
+                document.getElementById('dropzone').appendChild(chip);
+
+                if(userArr.length === count) {
+                    setTimeout(() => handleAnswer(JSON.stringify(userArr) === JSON.stringify(target)), 500);
+                }
+            };
+            document.getElementById('pool').appendChild(btn);
+        });
+    }
+</script>
+</body>
+</html>
